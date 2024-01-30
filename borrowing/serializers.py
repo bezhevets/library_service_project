@@ -34,3 +34,17 @@ class BorrowingListSerializer(BorrowingSerializer):
             "expected_return_date",
             "actual_return_data",
         )
+
+
+class BorrowingCreateSerializer(BorrowingSerializer):
+    def validate(self, attrs):
+        data = super(BorrowingCreateSerializer, self).validate(attrs)
+        Borrowing.valid_inventory_book(
+            attrs["book"].inventory,
+            serializers.ValidationError,
+        )
+        return data
+
+    class Meta:
+        model = Borrowing
+        fields = ("id", "book", "expected_return_date")
