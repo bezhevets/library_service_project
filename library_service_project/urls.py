@@ -21,4 +21,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/book_service/", include("book_service.urls", namespace="book_service"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
