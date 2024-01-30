@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from book_service.serializers import BookSerializer
@@ -48,3 +49,11 @@ class BorrowingCreateSerializer(BorrowingSerializer):
     class Meta:
         model = Borrowing
         fields = ("id", "book", "expected_return_date")
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            borrowing = Borrowing.objects.create(**validated_data)
+            borrowing.book.inventory -= 1
+            borrowing.book.save()
+
+        return borrowing
