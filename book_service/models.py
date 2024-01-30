@@ -15,13 +15,15 @@ class Book(models.Model):
     class CoverChoices(models.Choices):
         HARD = "Hard cover"
         SOFT = "Soft cover"
+
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=150)
     cover = models.CharField(max_length=50, choices=CoverChoices.choices)
-    image = models.ImageField(null=True, blank=True, upload_to=book_image_file_path)
+    image = models.ImageField(
+        null=True, blank=True, upload_to=book_image_file_path
+    )
     inventory = models.PositiveIntegerField()
     daily_fee = models.DecimalField(max_digits=10, decimal_places=2)
-
 
     def __str__(self):
         return f"{self.title}({self.author})"
