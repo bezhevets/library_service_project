@@ -3,13 +3,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from borrowing.models import Borrowing
+from borrowing.permissions import IsAdminOrIfAuthenticatedBorrowingPermission
 from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, BorrowingCreateSerializer
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.all().select_related("user", "book")
     serializer_class = BorrowingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrIfAuthenticatedBorrowingPermission]
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
