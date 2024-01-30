@@ -25,5 +25,6 @@ urlpatterns = [
         "book_service.urls", namespace="book_service"
     )
          ),
+    path("api/borrowing/", include("borrowing.urls", namespace="borrowing")),
     path("api/user/", include("user.urls", namespace="user"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
