@@ -21,9 +21,11 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/book_service/", include(
-        "book_service.urls", namespace="book_service"
-    )
-         ),
-    path("api/user/", include("user.urls", namespace="user"))
+    path(
+        "api/book_service/",
+        include("book_service.urls", namespace="book_service"),
+    ),
+    path("api/borrowing/", include("borrowing.urls", namespace="borrowing")),
+    path("api/user/", include("user.urls", namespace="user")),
+    path("__debug__/", include("debug_toolbar.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
