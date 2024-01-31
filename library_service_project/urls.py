@@ -21,10 +21,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/book_service/", include(
-        "book_service.urls", namespace="book_service"
-    )
-         ),
+    path(
+        "api/book_service/",
+        include("book_service.urls", namespace="book_service"),
+    ),
     path("api/borrowing/", include("borrowing.urls", namespace="borrowing")),
     path("api/user/", include("user.urls", namespace="user")),
     path("__debug__/", include("debug_toolbar.urls")),

@@ -7,7 +7,11 @@ from rest_framework.response import Response
 
 from borrowing.models import Borrowing
 from borrowing.permissions import IsAdminOrIfAuthenticatedBorrowingPermission
-from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, BorrowingCreateSerializer
+from borrowing.serializers import (
+    BorrowingSerializer,
+    BorrowingListSerializer,
+    BorrowingCreateSerializer,
+)
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -48,7 +52,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         if borrowing.actual_return_data:
             return Response(
                 {"detail": "This borrowing has already been returned."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         borrowing.actual_return_data = date.today()
@@ -57,5 +61,5 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         borrowing.save()
         return Response(
             {"detail": "This book was successfully returned."},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )

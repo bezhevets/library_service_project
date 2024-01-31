@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                 ),
                 ("borrow_date", models.DateTimeField(auto_now_add=True)),
                 ("expected_return_date", models.DateTimeField()),
-                ("actual_return_data", models.DateTimeField(blank=True, null=True)),
+                (
+                    "actual_return_data",
+                    models.DateTimeField(blank=True, null=True),
+                ),
                 (
                     "book",
                     models.ForeignKey(
