@@ -1,6 +1,5 @@
 from datetime import date
 
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,6 +11,8 @@ from borrowing.serializers import (
     BorrowingListSerializer,
     BorrowingCreateSerializer,
 )
+
+from borrowing.tasks import notification_new_borrowing
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -40,6 +41,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+        notification_new_borrowing.delay(serializer.data["id"])
 
     @action(
         methods=["GET"],
