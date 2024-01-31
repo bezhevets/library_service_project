@@ -4,6 +4,8 @@ from rest_framework import serializers
 from book_service.serializers import BookSerializer
 from borrowing.models import Borrowing
 
+from borrowing.tasks import notification_new_borrowing
+
 
 class BorrowingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,5 +57,7 @@ class BorrowingCreateSerializer(BorrowingSerializer):
             borrowing = Borrowing.objects.create(**validated_data)
             borrowing.book.inventory -= 1
             borrowing.book.save()
+
+            notification_new_borrowing.delay(borrowing.id)
 
         return borrowing

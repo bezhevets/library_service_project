@@ -12,8 +12,6 @@ from borrowing.serializers import (
     BorrowingCreateSerializer,
 )
 
-from borrowing.tasks import notification_new_borrowing
-
 
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.all().select_related("user", "book")
@@ -41,7 +39,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        notification_new_borrowing.delay(serializer.data["id"])
 
     @action(
         methods=["GET"],
