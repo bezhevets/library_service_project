@@ -27,5 +27,6 @@ urlpatterns = [
     ),
     path("api/borrowing/", include("borrowing.urls", namespace="borrowing")),
     path("api/user/", include("user.urls", namespace="user")),
+    path("api/payments/", include("payment.urls", namespace="payments")),
     path("__debug__/", include("debug_toolbar.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
