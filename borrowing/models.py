@@ -20,21 +20,13 @@ class Borrowing(models.Model):
         return f"{self.user.full_name} borrowing {self.book.title}"
 
     @staticmethod
-    def valid_inventory_date_book(inventory, expected_return_date, error_to_raise):
+    def valid_inventory_book(inventory, error_to_raise):
         if not inventory:
             raise error_to_raise({"book": "This book is out of stock."})
-        if expected_return_date < date.today():
-            raise error_to_raise(
-                {
-                    "expected_return_date":
-                        "Expected return date must be more today date."
-                }
-            )
 
     def clean(self):
-        Borrowing.valid_inventory_date_book(
+        Borrowing.valid_inventory_book(
             self.book.inventory,
-            self.expected_return_date,
             ValidationError,
         )
 
