@@ -19,16 +19,17 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrIfAuthenticatedBorrowingPermission]
 
     def get_queryset(self):
-        queryset = self.queryset
-        if self.request.user.is_staff:
-            is_active = self.request.query_params.get("is_active")
-            user_id = self.request.query_params.get("user_id")
-            if user_id:
-                queryset = queryset.filter(user_id=int(user_id))
-            if is_active == "true":
-                queryset = queryset.filter(actual_return_data__isnull=True)
-            return queryset
-        return queryset.filter(user=self.request.user)
+        queryset = Borrowing.objects.all().select_related("user", "book")
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+
+        is_active = self.request.query_params.get("is_active")
+        user_id = self.request.query_params.get("user_id")
+        if user_id:
+            queryset = queryset.filter(user_id=int(user_id))
+        if is_active == "true":
+            queryset = queryset.filter(actual_return_data__isnull=True)
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
