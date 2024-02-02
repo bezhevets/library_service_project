@@ -3,8 +3,10 @@ from rest_framework import serializers
 
 from book_service.serializers import BookSerializer
 from borrowing.models import Borrowing
+from payment.models import Payment
 
 from borrowing.tasks import notification_new_borrowing
+from payment.stripe_helper import create_checkout_session
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -59,5 +61,18 @@ class BorrowingCreateSerializer(BorrowingSerializer):
             borrowing.book.save()
 
             notification_new_borrowing.delay(borrowing.id)
+
+            session = create_checkout_session(
+                borrowing, self.context["request"]
+            )
+
+            Payment.objects.create(
+                status=Payment.StatusChoices.PENDING,
+                type=Payment.TypeChoices.PAYMENT,
+                borrowing=borrowing,
+                session_url=session.url,
+                session_id=session.id,
+                money_to_pay=session.amount_total / 100,
+            )
 
         return borrowing
