@@ -1,4 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from payment.models import Payment
 from payment.serializers import PaymentSerializer, PaymentListSerializer, PaymentDetailSerializer
@@ -34,3 +36,18 @@ class PaymentViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return PaymentDetailSerializer
         return PaymentSerializer
+
+
+class PaymentSuccessView(APIView):
+    def get(self, request, pk):
+        print(request)
+        return Response(
+            {"message": "Payment was successfully processed"}, status=status.HTTP_200_OK
+        )
+
+
+class PaymentCancelView(APIView):
+    def get(self, request, pk):
+        return Response(
+            {"message": "Payment can be paid later."}, status=status.HTTP_400_BAD_REQUEST
+        )
