@@ -1,5 +1,6 @@
 from datetime import date
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -122,3 +123,22 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             {"detail": "You must pay the fine before returning the book."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "is_active",
+                type=str,
+                description="Filter for staff user by active borrowings (still not returned)(ex. ?is_active=true)",
+                required=False,
+            ),
+            OpenApiParameter(
+                "user_id",
+                type=int,
+                description="Filter for staff user by user_id (ex. ?user_id=2)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
