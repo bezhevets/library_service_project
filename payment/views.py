@@ -14,6 +14,9 @@ from payment.serializers import (
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for create, list, retrieve payment.
+    """
     queryset = Payment.objects.select_related("borrowing")
     serializer_class = PaymentSerializer
 
@@ -46,6 +49,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 
 class PaymentSuccessView(APIView):
+    """
+    API endpoint for success payment.
+    """
     def get(self, request, pk):
         borrowing = Borrowing.objects.get(id=pk)
         payment = Payment.objects.get(borrowing=borrowing)
@@ -59,6 +65,9 @@ class PaymentSuccessView(APIView):
 
 
 class PaymentFineSuccessView(APIView):
+    """
+    API endpoint for success fine payment.
+    """
     def get(self, request, pk):
         borrowing = Borrowing.objects.get(id=pk)
         payment = Payment.objects.get(
@@ -79,6 +88,9 @@ class PaymentFineSuccessView(APIView):
 
 
 class PaymentCancelView(APIView):
+    """
+    API endpoint for cancelling payment.
+    """
     def get(self, request, pk):
         return Response(
             {
