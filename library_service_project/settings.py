@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "book_service",
     "user",
     "borrowing",
-    "payment"
+    "payment",
+    "drf_spectacular"
 ]
 
 MIDDLEWARE = [
@@ -152,6 +153,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -166,3 +168,16 @@ CELERY_RESULT_BACKEND = os.environ["CELERY_RESULT_BACKEND"]
 CELERY_TIMEZONE = os.environ["TZ"]
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Library Service Api",
+    "DESCRIPTION": "Library Service Api with payments and notifications",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "defaultModelRendering": "model",
+        "defaultModelsExpandDepth": 2,
+        "defaultModelExpandDepth": 2,
+    },
+}
