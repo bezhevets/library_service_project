@@ -11,6 +11,8 @@ from borrowing.serializers import (
     BorrowingListSerializer,
     BorrowingDetailSerializer,
 )
+from payment.models import Payment
+from payment.stripe_helper import create_fine_session
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -55,11 +57,27 @@ class BorrowingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        borrowing.actual_return_data = date.today()
-        borrowing.book.inventory += 1
-        borrowing.book.save()
-        borrowing.save()
+        if borrowing.expected_return_date >= date.today():
+            borrowing.actual_return_data = date.today()
+            borrowing.book.inventory += 1
+            borrowing.book.save()
+            borrowing.save()
+            return Response(
+                {"detail": "This book was successfully returned."},
+                status=status.HTTP_200_OK,
+            )
+
+        session = create_fine_session(borrowing, self.request)
+
+        Payment.objects.create(
+            status=Payment.StatusChoices.PENDING,
+            type=Payment.TypeChoices.FINE,
+            borrowing=borrowing,
+            session_url=session.url,
+            session_id=session.id,
+            money_to_pay=session.amount_total / 100,
+        )
         return Response(
-            {"detail": "This book was successfully returned."},
-            status=status.HTTP_200_OK,
+            {"detail": "You must pay the fine before returning the book."},
+            status=status.HTTP_400_BAD_REQUEST,
         )
