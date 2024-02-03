@@ -2,7 +2,7 @@
 
 ### How to run Celery and Celery Beat
 
-``celery -A library_service_project worker -l INFO --pool=solo``
+```celery -A library_service_project worker -l INFO --pool=solo```
 
 #### Celery Beat
 
