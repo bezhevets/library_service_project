@@ -1,10 +1,16 @@
+from datetime import date
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from borrowing.models import Borrowing
 from payment.models import Payment
-from payment.serializers import PaymentSerializer, PaymentListSerializer, PaymentDetailSerializer
+from payment.serializers import (
+    PaymentSerializer,
+    PaymentListSerializer,
+    PaymentDetailSerializer,
+)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -25,8 +31,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
         if self.action == "list":
             if not self.request.user.is_staff:
-                queryset = (
-                    queryset.filter(borrowing_id__user_id=self.request.user)
+                queryset = queryset.filter(
+                    borrowing_id__user_id=self.request.user
                 )
 
         return queryset
@@ -47,12 +53,37 @@ class PaymentSuccessView(APIView):
         payment.money_to_pay = 0
         payment.save()
         return Response(
-            {"message": "Payment was successfully processed"}, status=status.HTTP_200_OK
+            {"message": "Payment was successfully processed"},
+            status=status.HTTP_200_OK,
+        )
+
+
+class PaymentFineSuccessView(APIView):
+    def get(self, request, pk):
+        borrowing = Borrowing.objects.get(id=pk)
+        payment = Payment.objects.get(
+            borrowing=borrowing, type=Payment.TypeChoices.FINE
+        )
+        payment.status = Payment.StatusChoices.PAID
+        payment.money_to_pay = 0
+        payment.save()
+
+        borrowing.actual_return_data = date.today()
+        borrowing.book.inventory += 1
+        borrowing.book.save()
+        borrowing.save()
+        return Response(
+            {"message": "Payment fine was successfully processed"},
+            status=status.HTTP_200_OK,
         )
 
 
 class PaymentCancelView(APIView):
     def get(self, request, pk):
         return Response(
-            {"message": "Payment can be paid later. The session is available for only 24h"}, status=status.HTTP_400_BAD_REQUEST
+            {
+                "message":
+                    "Payment can be paid later. The session is available for only 24h"
+            },
+            status=status.HTTP_400_BAD_REQUEST,
         )
