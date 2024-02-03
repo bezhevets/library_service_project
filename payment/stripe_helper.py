@@ -9,7 +9,7 @@ stripe.api_key = os.environ["STRIPE_SECRET_KEY"]
 
 def calculate_amount_borrowing(borrowing):
     sum_days = borrowing.expected_return_date - borrowing.borrow_date
-    amount = int((sum_days.days + 1) * borrowing.book.daily_fee)
+    amount = (sum_days.days + 1) * borrowing.book.daily_fee
     return amount
 
 
@@ -29,7 +29,7 @@ def create_checkout_session(borrowing, request):
                     "product_data": {
                         "name": borrowing.book.title,
                     },
-                    "unit_amount": calculate_amount_borrowing(borrowing) * 100,
+                    "unit_amount": int(calculate_amount_borrowing(borrowing) * 100),
                 },
                 "quantity": 1,
             }
