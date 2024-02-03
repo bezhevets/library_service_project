@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from book_service.models import Book
 from borrowing.models import Borrowing
-from borrowing.serializers import BorrowingListSerializer, BorrowingCreateSerializer
+from borrowing.serializers import BorrowingListSerializer, BorrowingSerializer
 from borrowing.views import BorrowingViewSet
 
 BORROWING_URL = reverse("borrowing:borrowing-list")
@@ -135,4 +135,4 @@ class AuthenticatedPlayApiTests(TestCase):
 
         serializer_class = view.get_serializer_class()
 
-        self.assertEqual(serializer_class, BorrowingCreateSerializer)
+        self.assertEqual(serializer_class, BorrowingSerializer)

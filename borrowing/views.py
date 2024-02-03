@@ -9,7 +9,7 @@ from borrowing.permissions import IsAdminOrIfAuthenticatedBorrowingPermission
 from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
-    BorrowingCreateSerializer,
+    BorrowingDetailSerializer,
 )
 
 
@@ -32,10 +32,10 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action == "list":
             return BorrowingListSerializer
-        if self.action == "create":
-            return BorrowingCreateSerializer
+        if self.action == "retrieve":
+            return BorrowingDetailSerializer
         return BorrowingSerializer
 
     def perform_create(self, serializer):
