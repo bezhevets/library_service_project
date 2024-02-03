@@ -11,6 +11,15 @@ from payment.stripe_helper import create_checkout_session
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for handling book borrowings.
+
+    This serializer is responsible for validating and creating book borrowings.
+    It ensures that the inventory of the borrowed book is valid, and it handles
+    the creation of the borrowing record, updating the book inventory,
+    creating a checkout session, and generating a payment for the borrowing.
+    """
+
     def validate(self, attrs):
         data = super(BorrowingSerializer, self).validate(attrs)
         Borrowing.valid_inventory_book(
@@ -24,6 +33,15 @@ class BorrowingSerializer(serializers.ModelSerializer):
         fields = ("id", "book", "expected_return_date")
 
     def create(self, validated_data):
+        """
+        Create a new borrowing record.
+
+        This method handles the creation of a new borrowing record,
+        updating the book inventory, creating a checkout session,
+        generating a payment for the borrowing, and triggering
+        a notification for the new borrowing.
+        """
+
         with transaction.atomic():
             borrowing = Borrowing.objects.create(**validated_data)
             borrowing.book.inventory -= 1
@@ -47,11 +65,15 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
 
 class BorrowingListSerializer(BorrowingSerializer):
-    book = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
+    book = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="title"
+    )
     user = serializers.SlugRelatedField(
         many=False, read_only=True, slug_field="full_name"
     )
-    payments = serializers.SlugRelatedField(many=True, read_only=True, slug_field="status")
+    payments = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="status"
+    )
 
     class Meta:
         model = Borrowing
@@ -62,7 +84,7 @@ class BorrowingListSerializer(BorrowingSerializer):
             "borrow_date",
             "expected_return_date",
             "actual_return_data",
-            "payments"
+            "payments",
         )
 
 
@@ -79,5 +101,5 @@ class BorrowingDetailSerializer(BorrowingSerializer):
             "borrow_date",
             "expected_return_date",
             "actual_return_data",
-            "payments"
+            "payments",
         )

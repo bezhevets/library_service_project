@@ -20,7 +20,7 @@ def sample_book(**params):
         "author": "Test Test",
         "cover": "Hard cover",
         "inventory": 2,
-        "daily_fee": 0.1
+        "daily_fee": 0.1,
     }
     defaults.update(params)
     return Book.objects.create(**defaults)
@@ -57,17 +57,13 @@ class AuthenticatedPlayApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="123456@test.com",
-            password="Test122345",
-            is_staff=True
+            email="123456@test.com", password="Test122345", is_staff=True
         )
         self.user2 = sample_user(email="qwer@test.com")
         self.borrowing1 = sample_borrowing(user=self.user)
         self.borrowing2 = sample_borrowing(user=self.user2)
 
-
     def test_list_borrowings_non_admin(self):
-
         self.client.force_authenticate(self.user2)
 
         res = self.client.get(BORROWING_URL)
@@ -77,10 +73,9 @@ class AuthenticatedPlayApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), len(serializer.data))
         for item1, item2 in zip(res.data, serializer.data):
-            self.assertEqual(item1['id'], item2['id'])
+            self.assertEqual(item1["id"], item2["id"])
 
     def test_list_borrowings_admin(self):
-
         self.client.force_authenticate(self.user)
 
         res = self.client.get(BORROWING_URL)
@@ -90,7 +85,7 @@ class AuthenticatedPlayApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), len(serializer.data))
         for item1, item2 in zip(res.data, serializer.data):
-            self.assertEqual(item1['id'], item2['id'])
+            self.assertEqual(item1["id"], item2["id"])
 
     def test_admin_filter_by_user_id(self):
         self.client.force_authenticate(self.user)
@@ -111,7 +106,7 @@ class AuthenticatedPlayApiTests(TestCase):
         serializer3 = BorrowingListSerializer(
             sample_borrowing(
                 user=sample_user(email="asdfg@a.com"),
-                actual_return_data=date.today()
+                actual_return_data=date.today(),
             )
         )
 

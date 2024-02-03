@@ -16,6 +16,29 @@ from payment.stripe_helper import create_fine_session
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
+
+    """
+    API endpoint for managing book borrowings.
+
+    list:
+    Retrieve a list of book borrowings. If the user is not staff,
+    only their borrowings will be included.
+    Additional filtering can be applied using query parameters,
+    such as 'user_id' and 'is_active'.
+
+    retrieve:
+    Retrieve details of a specific book borrowing.
+
+    create:
+    Create a new book borrowing.
+
+    return_book:
+    Custom action to mark a borrowed book as returned.
+    If the book is returned on time, it updates the return date.
+    If the book is returned late, it generates a fine and prompts
+    the user to pay it.
+    """
+
     queryset = Borrowing.objects.all().select_related("user", "book")
     serializer_class = BorrowingSerializer
     permission_classes = [IsAdminOrIfAuthenticatedBorrowingPermission]
@@ -41,6 +64,12 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return BorrowingSerializer
 
     def perform_create(self, serializer):
+        """
+        Perform custom actions when creating a new book borrowing.
+
+        Assigns the borrowing to the current user.
+        """
+
         serializer.save(user=self.request.user)
 
     @action(
@@ -49,6 +78,18 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         url_path="return",
     )
     def return_book(self, request, pk=None):
+        """
+        Return a borrowed book.
+
+        Parameters:
+        - 'pk' (int): ID of the borrowing object.
+
+        Returns:
+        - HTTP 200 OK if the book was successfully returned.
+        - HTTP 400 Bad Request if there is an issue returning
+        the book or paying a fine.
+        """
+
         borrowing = self.get_object()
 
         if borrowing.actual_return_data:
