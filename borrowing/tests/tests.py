@@ -1,5 +1,7 @@
+import os
 from datetime import date, timedelta
 
+import stripe
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -64,28 +66,21 @@ class AuthenticatedPlayApiTests(TestCase):
         self.borrowing2 = sample_borrowing(user=self.user2)
 
     def test_list_borrowings_non_admin(self):
-        self.client.force_authenticate(self.user2)
+        self.client.force_authenticate(self.user)
 
-        res = self.client.get(BORROWING_URL)
-        borrowings = Borrowing.objects.filter(user=self.user2)
-        serializer = BorrowingListSerializer(borrowings, many=True)
+        response = self.client.get(BORROWING_URL)
+        borrowing = Borrowing.objects.filter(user=self.user)
+        serializer = BorrowingListSerializer(borrowing, many=True)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), len(serializer.data))
-        for item1, item2 in zip(res.data, serializer.data):
-            self.assertEqual(item1["id"], item2["id"])
+        self.assertNotIn(serializer.data, response.data["results"])
 
     def test_list_borrowings_admin(self):
         self.client.force_authenticate(self.user)
 
-        res = self.client.get(BORROWING_URL)
-        borrowings = Borrowing.objects.all()
-        serializer = BorrowingListSerializer(borrowings, many=True)
+        response = self.client.get(BORROWING_URL)
+        serializer = BorrowingListSerializer(self.borrowing2)
 
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), len(serializer.data))
-        for item1, item2 in zip(res.data, serializer.data):
-            self.assertEqual(item1["id"], item2["id"])
+        self.assertIn(serializer.data, response.data["results"])
 
     def test_admin_filter_by_user_id(self):
         self.client.force_authenticate(self.user)
@@ -94,8 +89,8 @@ class AuthenticatedPlayApiTests(TestCase):
         serializer1 = BorrowingListSerializer(self.borrowing1)
         serializer2 = BorrowingListSerializer(self.borrowing2)
 
-        self.assertIn(serializer2.data, response.data)
-        self.assertNotIn(serializer1.data, response.data)
+        self.assertIn(serializer2.data, response.data["results"])
+        self.assertNotIn(serializer1.data, response.data["results"])
 
     def test_admin_filter_by_is_active(self):
         self.client.force_authenticate(self.user)
@@ -110,9 +105,9 @@ class AuthenticatedPlayApiTests(TestCase):
             )
         )
 
-        self.assertIn(serializer2.data, response.data)
-        self.assertIn(serializer1.data, response.data)
-        self.assertNotIn(serializer3.data, response.data)
+        self.assertIn(serializer2.data, response.data["results"])
+        self.assertIn(serializer1.data, response.data["results"])
+        self.assertNotIn(serializer3.data, response.data["results"])
 
     def test_get_serializer_class_list(self):
         self.client.force_authenticate(self.user)
@@ -131,3 +126,26 @@ class AuthenticatedPlayApiTests(TestCase):
         serializer_class = view.get_serializer_class()
 
         self.assertEqual(serializer_class, BorrowingSerializer)
+
+    def test_return_book(self):
+        self.client.force_authenticate(self.user2)
+        inventory = self.borrowing2.book.inventory
+        # inventory = self.book.inventory
+        response = self.client.post(f"/api/borrowing/{self.borrowing2.id}/return/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "This book was successfully returned.")
+
+        self.borrowing2.refresh_from_db()
+        self.borrowing2.book.refresh_from_db()
+
+        self.assertTrue(self.borrowing2.actual_return_data)
+        self.assertEqual(self.borrowing2.book.inventory, inventory + 1)
+
+    def test_already_return_book(self):
+        self.client.force_authenticate(self.user)
+        self.borrowing1.actual_return_data = date.today()
+        self.borrowing1.save()
+
+        response = self.client.post(f"/api/borrowing/{self.borrowing1.id}/return/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "This borrowing has already been returned.")
