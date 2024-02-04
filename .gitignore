@@ -1,0 +1,13 @@
+.venv
+.env
+.idea/
+.vscode/
+*.iml
+.DS_Store
+venv/
+.pytest_cache/
+**__pycache__/
+**db.sqlite3
+.flake8
+media
+pyproject.toml
