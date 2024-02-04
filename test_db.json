@@ -1,0 +1,100 @@
+[
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2024-02-04T10:43:36.730Z",
+    "user": 1,
+    "content_type": 6,
+    "object_id": "1",
+    "object_repr": "01 12 * * * (m/h/dM/MY/d) Europe/Kiev",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2024-02-04T10:43:43.047Z",
+    "user": 1,
+    "content_type": 8,
+    "object_id": "1",
+    "object_repr": "Checking borrowings overdue: 01 12 * * * (m/h/dM/MY/d) Europe/Kiev",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "854x5qehujjophu7fi0g019ke8c898pn",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGlnxZ71ASZ8zRLv2BgeQLcVJhbg7spQC2jcz760m2rc87U3WaUnqqow6_W5M8Smlg_Sgcq861rKtC-uu6IM2PdYkr9vh_h1karnXwXmRAOLAIyVjyFobiGfLbFxMDhkkzOfBR8smorPoEbxLCBeBMKjPF-LMN2U:1rWZx5:-pvTsFlF2SQd52SUrr2ExVmLgtGqTHZNHRgRGBTp3js",
+    "expire_date": "2024-02-18T10:42:19.168Z"
+  }
+},
+{
+  "model": "django_celery_beat.crontabschedule",
+  "pk": 1,
+  "fields": {
+    "minute": "01",
+    "hour": "12",
+    "day_of_week": "*",
+    "day_of_month": "*",
+    "month_of_year": "*",
+    "timezone": "Europe/Kiev"
+  }
+},
+{
+  "model": "django_celery_beat.periodictasks",
+  "pk": 1,
+  "fields": {
+    "last_update": "2024-02-04T10:43:43.041Z"
+  }
+},
+{
+  "model": "django_celery_beat.periodictask",
+  "pk": 1,
+  "fields": {
+    "name": "Checking borrowings overdue",
+    "task": "borrowing.tasks.check_borrowings_overdue",
+    "interval": null,
+    "crontab": 1,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": null,
+    "one_off": false,
+    "start_time": null,
+    "enabled": true,
+    "last_run_at": null,
+    "total_run_count": 0,
+    "date_changed": "2024-02-04T10:43:43.038Z",
+    "description": ""
+  }
+},
+{
+  "model": "user.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$LXvXbLpR3SZ9DNXcqxPiZ1$s2E++QZVEAhDp4C5bpg2edWJ7jTd6RC9w3xPsWeJfMc=",
+    "last_login": "2024-02-04T10:42:19.124Z",
+    "is_superuser": true,
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2024-02-04T10:25:30.074Z",
+    "email": "admin@admin.com",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]
