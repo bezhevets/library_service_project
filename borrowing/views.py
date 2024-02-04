@@ -10,7 +10,7 @@ from borrowing.permissions import IsAdminOrIfAuthenticatedBorrowingPermission
 from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
-    BorrowingDetailSerializer,
+    BorrowingDetailSerializer, BorrowingReturnSerializer,
 )
 from payment.models import Payment
 from payment.stripe_helper import create_fine_session
@@ -62,6 +62,8 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             return BorrowingListSerializer
         if self.action == "retrieve":
             return BorrowingDetailSerializer
+        if self.action == "return_book":
+            return BorrowingReturnSerializer
         return BorrowingSerializer
 
     def perform_create(self, serializer):
@@ -74,7 +76,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     @action(
-        methods=["GET"],
+        methods=["POST"],
         detail=True,
         url_path="return",
     )

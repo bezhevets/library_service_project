@@ -103,3 +103,9 @@ class BorrowingDetailSerializer(BorrowingSerializer):
             "actual_return_data",
             "payments",
         )
+
+
+class BorrowingReturnSerializer(BorrowingSerializer):
+    class Meta:
+        model = Borrowing
+        fields = ["id"]
