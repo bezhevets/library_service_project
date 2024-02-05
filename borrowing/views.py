@@ -45,7 +45,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrIfAuthenticatedBorrowingPermission]
 
     def get_queryset(self):
-        queryset = Borrowing.objects.all().select_related("user", "book")
+        queryset = Borrowing.objects.select_related("user", "book").prefetch_related("payments")
         if not self.request.user.is_staff:
             queryset = queryset.filter(user=self.request.user)
 
